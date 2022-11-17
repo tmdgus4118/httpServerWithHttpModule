@@ -75,16 +75,40 @@ const httpRequestListener = function (request, response) {
           email: user.email,
           password: user.password,
         });
+
         response.writeHead(200, { "Content-Type": "application/json" });
         response.end(JSON.stringify({ users: users }));
       });
     }
   }
+  if (method === "POST") {
+    if (url === "/users/newpost") {
+      let body = "";
+
+      request.on("data", (data) => {
+        body += data;
+      });
+
+      request.on("end", () => {
+        const posts = JSON.parse(body);
+
+        posts.push({
+          id: posts.id,
+          title: posts.title,
+          content: posts.content,
+          userId: posts.userId,
+        });
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify({ posts: posts }));
+      });
+    }
+  }
 };
+
 server.on("request", httpRequestListener);
 
 const IP = "127.0.0.1";
-const PORT = 8000;
+const PORT = 8009;
 
 server.listen(PORT, IP, function () {
   console.log(`Listening to request on ip ${IP} & port ${PORT}`);
